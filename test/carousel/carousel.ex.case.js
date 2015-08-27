@@ -34,7 +34,7 @@ describe('carousel', function(){
             }, 1000);
         });
 
-        it('#点击右边箭头，切换到图2', function(){
+        it('#点击右边箭头，切换到图2', function(done){
             arrows.eq(1).simulate("click");
 
             delay(done, function() {
@@ -42,7 +42,7 @@ describe('carousel', function(){
             }, 100);
         });
 
-        it('#点击左边箭头，切换到图1', function () {
+        it('#点击左边箭头，切换到图1', function (done) {
             arrows.eq(0).simulate("click");
 
             delay(done, function() {
