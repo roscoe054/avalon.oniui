@@ -463,7 +463,7 @@ define(["../avalon.getModel",
                 avalon(element).attr("ms-css-width", "width")
                 vmodel.weekNames = calendarHeader()
 
-                if (element.tagName === "INPUT" && vmodel.type !== "range") {
+                if (element.tagName === "INPUT" && vmodel.type !== "range") { // not daterangepicker
                     var div = document.createElement("div")
                     div.className = "oni-datepicker-input-wrapper"
                     div.setAttribute("ms-class", "oni-datepicker-active:toggle")
@@ -477,7 +477,21 @@ define(["../avalon.getModel",
                     } else {
                         element.style.paddingRight = "0px"
                     }
-                    div.appendChild(calendar)
+
+                    // position calendar
+                    var positionLeft = getOffset(div).left + 2
+                    var positionTop = getOffset(div).top + avalon(div).height() + 2
+                    avalon(calendar).css({"position": "absolute", "top": positionTop, "left": positionLeft})
+
+                    //处理container
+                    //var docBody = document.body, container = vm.container;
+                    //
+                    //// container必须是dom tree中某个元素节点对象或者元素的id，默认添加到body元素
+                    //vm.container = (avalon.type(container) === "object"
+                    //                && container.nodeType === 1
+                    //                && docBody.contains(container) ? container : document.getElementById(container)) || docBody;
+
+                    document.body.appendChild(calendar)
                 }
                 if (vmodel.timer) {
                     vmodel.width = 100
@@ -516,6 +530,17 @@ define(["../avalon.getModel",
                 if (typeof options.onInit === "function" ){
                     //vmodels是不包括vmodel的
                     options.onInit.call(element, vmodel, options, vmodels)
+                }
+
+                function getOffset( el ) {
+                    var _x = 0;
+                    var _y = 0;
+                    while( el && !isNaN( el.offsetLeft ) && !isNaN( el.offsetTop ) ) {
+                        _x += el.offsetLeft - el.scrollLeft;
+                        _y += el.offsetTop - el.scrollTop;
+                        el = el.offsetParent;
+                    }
+                    return { top: _y, left: _x };
                 }
             }
             vm._getTitle = function(year, month) {
@@ -1176,6 +1201,7 @@ define(["../avalon.getModel",
     widget.version = 1.0
     widget.defaults = {
         calendarWidth: 196, //@config 设置日历展示宽度
+        container: "", //@config 日期下拉框容器，默认为body
         startDay: 1, //@config 设置每一周的第一天是哪天，0代表Sunday，1代表Monday，依次类推, 默认从周一开始
         minute: 0, //@config 设置time的默认minute
         hour: 0, //@config 设置time的hour

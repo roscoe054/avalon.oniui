@@ -247,9 +247,10 @@ define(["../avalon.getModel",
                     inputs
 
                 daterangepicker = avalon.parseHTML(options.template).firstChild
-                inputs = daterangepicker.getElementsByTagName("input")
                 container = daterangepicker.children[0]
                 calendarWrapper = daterangepicker.children[1]
+                document.body.appendChild(calendarWrapper)
+                inputs = calendarWrapper.getElementsByTagName("input")
                 inputFrom = inputs[0]
                 inputTo = inputs[1]
                 vmodel.container = container
@@ -269,10 +270,11 @@ define(["../avalon.getModel",
                     inputFromValue = duplexFrom[1][duplexFrom[0]]
                 }
                 applyRules(inputFromValue && parseDate(inputFromValue))
-                avalon.scan(element, [vmodel].concat(vmodels)) 
+                avalon.scan(element, [vmodel].concat(vmodels))
+                avalon.scan(calendarWrapper, [vmodel].concat(vmodels))
                 // 扫描完daterangepicker组件之后才扫描datepicker
                 avalon.nextTick(function() {
-                    var duplexFromName = duplexFrom ? duplexFrom[0].trim() : 'inputFromValue', 
+                    var duplexFromName = duplexFrom ? duplexFrom[0].trim() : 'inputFromValue',
                         duplexToName = duplexTo ? duplexTo[0].trim() : 'inputToValue',
                         fromVM = duplexFrom ? [vmodel, duplexFrom[1]] : [vmodel],
                         toVM = duplexTo ? [vmodel, duplexTo[1]] : [vmodel];
@@ -288,6 +290,23 @@ define(["../avalon.getModel",
                         options.onInit.call(element, vmodel, options, vmodels)
                     }
                 })
+
+                // position widget
+                var positionLeft = getOffset(daterangepicker).left + 2
+                var positionTop = getOffset(daterangepicker).top + avalon(daterangepicker).height() + 2
+                avalon(calendarWrapper).css({"position": "absolute", "top": positionTop, "left": positionLeft})
+                //document.body.appendChild(calendarWrapper)
+
+                function getOffset( el ) {
+                    var _x = 0;
+                    var _y = 0;
+                    while( el && !isNaN( el.offsetLeft ) && !isNaN( el.offsetTop ) ) {
+                        _x += el.offsetLeft - el.scrollLeft;
+                        _y += el.offsetTop - el.scrollTop;
+                        el = el.offsetParent;
+                    }
+                    return { top: _y, left: _x };
+                }
             }
             vm.$remove = function() {
                 element.innerHTML = element.textContent = ""
